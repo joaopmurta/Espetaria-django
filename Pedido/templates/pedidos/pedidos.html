@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Gerência dePedidos</title>
+</head>
+<body>
+    <h1>Gereência de Pedidos</h1>
+    <h3>Status: {{ filtered_status }}</h3>
+    <h4>Mesa: {{ mesa }}</h4>
+
+    <a href="{% url 'home' %}">
+        <button>Voltar para a tela inicial</button>
+    </a>
+
+    {% if pedidos %}
+        {% for pedido in pedidos %}
+            <hr>
+            <h3>Pedido #{{ pedido.id }} - Mesa {{ pedido.mesa }}</h3>
+            {% if pedido.is_manager %}
+                <p>Garçom: {{ pedido.garcom.usuario.get_full_name|default:pedido.garcom.usuario.username }} (Gerente)</p>
+            {% else %}
+                <p>Garçom: {{ pedido.garcom.usuario.get_full_name|default:pedido.garcom.usuario.username }}</p>
+            {% endif %}
+            <p>Criado em: {{ pedido.criado_em|date:"d/m/Y H:i" }}</p>
+
+            <ul>
+                {% for item in pedido.itempedido_set.all %}
+                    <li>
+                        {{ item.quantidade }}x {{ item.espeto.nome }}
+                        {% if item.ponto %}
+                            ({{ item.ponto }})
+                        {% endif %}
+                    </li>
+                {% empty %}
+                    <li>Sem itens registrados.</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    {% else %}
+        <p>Não há pedidos pendentes de entrega.</p>
+    {% endif %}
+</body>
+</html>

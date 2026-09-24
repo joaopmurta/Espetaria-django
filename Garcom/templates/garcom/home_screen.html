@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tela de Início</title>
+</head>
+<body>
+    <!-- O Django sabe quem logou e guarda isso na variável 'user' -->
+    <h2>Bem-vindo, {{ user.username }}!</h2>
+    <p>Esta é a tela geral. O que deseja fazer?</p>
+
+    <!-- Botão de acesso liberado para o Garçom -->
+    <a href="{% url 'lancar_pedido' %}">
+        <button>Lançar Novo Pedido</button>
+    </a>
+
+    <a href="{% url 'pedidos' %}">
+        <button>Visualizar Pedidos</button>
+    </a>
+
+    <!-- Verifica se o usuário faz parte da equipe administrativa -->
+    {% for group in user.groups.all%}
+        {% if group.name == 'Gerente' %}
+            <hr>
+            <h3>Área da Gerência</h3>
+            <a href="{% url 'painel_espetos' %}">
+                <button>Gerenciar Espetos (CRUD)</button>
+            </a>
+            <hr>
+        {% endif %}
+    {% endfor %}
+    
+    
+    <br><br>
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Sair do Sistema</button>
+    </form>
+</body>
+</html>

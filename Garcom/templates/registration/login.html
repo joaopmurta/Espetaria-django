@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Sistema de Pedidos</title>
+</head>
+<body>
+    <h2>Acesso Restrito</h2>
+    
+    <form method="post">
+        {% csrf_token %} <!-- Proteção de segurança obrigatória do Django -->
+        {{ form.as_p }}  <!-- Imprime os campos de Usuário e Senha -->
+        <button type="submit">Entrar</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Espeto</title>
+</head>
+<body>
+    <h2>Editar Espeto</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label for="nome">Nome:</label><br>
+        <input type="text" id="nome" name="nome" value="{{ espeto.nome }}"><br><br>
+
+        <label for="tipo">Tipo:</label><br>
+        <input type="text" id="tipo" name="tipo" value="{{ espeto.tipo }}"><br><br>
+
+        <label for="preco">Preço:</label><br>
+        <input type="text" id="preco" name="preco" value="{{ espeto.preco }}"><br><br>
+
+        <button type="submit">Confirmar</button>
+        <a href="{% url 'painel_espetos' %}">Cancelar</a>
+    </form>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Novo Pedido</title>
+</head>
+<body>
+    <h2>Lançar Novo Pedido 🍔</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Formulário da Mesa (Pai) -->
+        <h3>Dados da Mesa</h3>
+        {{ form_pedido.as_p }}
+
+        <hr>
+
+        <div id="espetos-container">
+            <!-- Formulários dos Espetos (Filhos - Formset) -->
+            <h3>Espetos</h3>
+            {{ formset_itens.management_form }}
+            
+            {% for form in formset_itens %}
+                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc;">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-espeto">Adicionar Espeto</button>
+
+        <div id="empty-form" style="display: none;">
+            {{ formset_itens.empty_form.as_p }}
+        </div>
+
+        <br>
+        <button type="submit">Salvar Pedido</button>
+        <a href="{% url 'home' %}">Cancelar</a>
+    </form>
+
+    <script>
+        document.getElementById('add-espeto').addEventListener('click', function() {
+            const container = document.getElementById('espetos-container');
+            const emptyForm = document.getElementById('empty-form').innerHTML;
+            const totalForms = parseInt(document.getElementById('id_itempedido_set-TOTAL_FORMS').value);
+
+            // Atualiza o índice do formulário vazio
+            const newFormHtml = emptyForm.replace(/__prefix__/g, totalForms);
+            const newDiv = document.createElement('div');
+            newDiv.style.marginBottom = '15px';
+            newDiv.style.padding = '10px';
+            newDiv.style.border = '1px solid #ccc';
+            newDiv.innerHTML = newFormHtml;
+
+            container.appendChild(newDiv);
+
+            // Atualiza o total de formulários
+            document.getElementById('id_itempedido_set-TOTAL_FORMS').value = totalForms + 1;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Variáveis de ambiente (NUNCA  subir)
+.env
+
+# Banco de dados local
+db.sqlite3
+
+# Arquivos do Python e ambientes virtuais
+__pycache__/
+*.pyc
+venv/
+env/
+miniconda3/
