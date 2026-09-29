@@ -81,11 +81,26 @@ TEMPLATES = [
 ]
 
 ASGI_APPLICATION = 'crud.asgi.application'
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
+# Configuração do Django Channels (WebSockets)
+REDIS_URL = os.environ.get('REDIS_URL')
+
+if REDIS_URL:
+    # PRODUÇÃO: Usa o serviço Redis do Render
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                "hosts": [REDIS_URL],
+            },
+        },
+    }
+else:
+    # LOCAL: Usa a memória RAM do seu computador
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        },
+    }
 #WSGI_APPLICATION = 'crud.wsgi.application'
 
 
