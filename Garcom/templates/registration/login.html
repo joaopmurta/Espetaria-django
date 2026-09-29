@@ -1,15 +1,21 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-    <title>Login - Sistema de Pedidos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar | Espetaria</title>
+    <link rel="stylesheet" href="{% static 'Garcom/css/app.css' %}">
 </head>
-<body>
-    <h2>Acesso Restrito</h2>
-    
-    <form method="post">
-        {% csrf_token %} <!-- Proteção de segurança obrigatória do Django -->
-        {{ form.as_p }}  <!-- Imprime os campos de Usuário e Senha -->
-        <button type="submit">Entrar</button>
-    </form>
+<body class="login-page">
+    <main class="login-card">
+        <h1>Espetaria</h1>
+        <p class="muted">Acesso restrito à equipe</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Entrar</button>
+        </form>
+    </main>
 </body>
 </html>

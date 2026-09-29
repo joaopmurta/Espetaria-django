@@ -1,26 +1,26 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Espeto</title>
-</head>
-<body>
-    <h2>Adicionar Espeto</h2>
+{% extends "base.html" %}
 
-    <form method="POST">
-        {% csrf_token %}
+{% block title %}Adicionar espeto | Espetaria{% endblock %}
 
-        <label for="nome">Nome:</label><br>
-        <input type="text" id="nome" name="nome" ><br><br>
+{% block content %}
+    <div class="page-heading">
+        <a class="back-link" href="{% url 'painel_espetos' %}" aria-label="Voltar para os espetos" title="Voltar">←</a>
+        <div>
+            <h1>Adicionar espeto</h1>
+            <p>Inclua um novo item no cardápio.</p>
+        </div>
+    </div>
 
-        <label for="tipo">Tipo:</label><br>
-        <input type="text" id="tipo" name="tipo" ><br><br>
-
-        <label for="preco">Preço:</label><br>
-        <input type="text" id="preco" name="preco" ><br><br>
-
-        <button type="submit">Confirmar</button>
-        <a href="{% url 'painel_espetos' %}">Cancelar</a>
-    </form>
-</body>
-</html>
+    <section class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            <p><label for="nome">Nome</label><input type="text" id="nome" name="nome" required></p>
+            <p><label for="tipo">Tipo</label><input type="text" id="tipo" name="tipo" required></p>
+            <p><label for="preco">Preço</label><input type="text" id="preco" name="preco" inputmode="decimal" required></p>
+            <div class="form-actions">
+                <button type="submit">Salvar espeto</button>
+                <a class="back-link" href="{% url 'painel_espetos' %}" aria-label="Cancelar e voltar" title="Cancelar">←</a>
+            </div>
+        </form>
+    </section>
+{% endblock %}

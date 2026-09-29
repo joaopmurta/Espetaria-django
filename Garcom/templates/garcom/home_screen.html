@@ -1,39 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Tela de Início</title>
-</head>
-<body>
-    <!-- O Django sabe quem logou e guarda isso na variável 'user' -->
-    <h2>Bem-vindo, {{ user.username }}!</h2>
-    <p>Esta é a tela geral. O que deseja fazer?</p>
+{% extends "base.html" %}
 
-    <!-- Botão de acesso liberado para o Garçom -->
-    <a href="{% url 'lancar_pedido' %}">
-        <button>Lançar Novo Pedido</button>
-    </a>
+{% block title %}Início | Espetaria{% endblock %}
 
-    <a href="{% url 'pedidos' %}">
-        <button>Visualizar Pedidos</button>
-    </a>
+{% block content %}
+    <div class="page-heading">
+        <div>
+            <h1>Bem-vindo, {{ user.get_short_name|default:user.username }}!</h1>
+            <p>O que você gostaria de fazer?</p>
+        </div>
+    </div>
 
-    <!-- Verifica se o usuário faz parte da equipe administrativa -->
-    {% for group in user.groups.all%}
-        {% if group.name == 'Gerente' %}
-            <hr>
-            <h3>Área da Gerência</h3>
-            <a href="{% url 'painel_espetos' %}">
-                <button>Gerenciar Espetos (CRUD)</button>
-            </a>
-            <hr>
-        {% endif %}
-    {% endfor %}
-    
-    
-    <br><br>
-    <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Sair do Sistema</button>
-    </form>
-</body>
-</html>
+    <section class="home-grid" aria-label="Ações principais">
+        <a class="home-card" href="{% url 'lancar_pedido' %}">
+            <div><h2>Novo pedido</h2><p>Lance um pedido para uma mesa.</p></div>
+            <span class="button">Lançar pedido</span>
+        </a>
+        <a class="home-card" href="{% url 'pedidos' %}">
+            <div><h2>Acompanhar pedidos</h2><p>Consulte a fila e acompanhe os status.</p></div>
+            <span class="button">Ver pedidos</span>
+        </a>
+        {% for group in user.groups.all %}
+            {% if group.name == 'Gerente' %}
+                <a class="home-card" href="{% url 'painel_espetos' %}">
+                    <div><h2>Gerenciar cardápio</h2><p>Cadastre e edite os espetos disponíveis.</p></div>
+                    <span class="button">Gerenciar espetos</span>
+                </a>
+            {% endif %}
+        {% endfor %}
+    </section>
+{% endblock %}

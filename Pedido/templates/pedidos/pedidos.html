@@ -1,44 +1,96 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Gerência dePedidos</title>
-</head>
-<body>
-    <h1>Gereência de Pedidos</h1>
-    <h3>Status: {{ filtered_status }}</h3>
-    <h4>Mesa: {{ mesa }}</h4>
+{% extends "base.html" %}
 
-    <a href="{% url 'home' %}">
-        <button>Voltar para a tela inicial</button>
-    </a>
+{% block title %}Pedidos | Espetaria{% endblock %}
+
+{% block content %}
+    <div class="page-heading">
+        <a class="back-link" href="{% url 'home' %}" aria-label="Voltar para a tela inicial" title="Voltar">←</a>
+        <div>
+            <h1>Pedidos</h1>
+            <p>Acompanhe os pedidos e atualize o andamento.</p>
+        </div>
+    </div>
+
+    <form class="panel filter-panel" method="get" action="{% url 'pedidos' %}">
+        <div class="filter-row">
+            <div class="filter-field">
+                <label for="status">Status</label>
+                <select name="status" id="status">
+                    <option value="todos" {% if filtered_status == 'todos' %}selected{% endif %}>Todos os status</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if filtered_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-field">
+                <label for="mesa">Mesa</label>
+                <select name="mesa" id="mesa">
+                    <option value="">Todas as mesas</option>
+                    {% for mesa_opcao in mesas %}
+                        <option value="{{ mesa_opcao.id }}" {% if mesa == mesa_opcao.id|stringformat:"s" %}selected{% endif %}>
+                            Mesa {{ mesa_opcao.numero }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">Filtrar</button>
+        </div>
+    </form>
 
     {% if pedidos %}
-        {% for pedido in pedidos %}
-            <hr>
-            <h3>Pedido #{{ pedido.id }} - Mesa {{ pedido.mesa }}</h3>
-            {% if pedido.is_manager %}
-                <p>Garçom: {{ pedido.garcom.usuario.get_full_name|default:pedido.garcom.usuario.username }} (Gerente)</p>
-            {% else %}
-                <p>Garçom: {{ pedido.garcom.usuario.get_full_name|default:pedido.garcom.usuario.username }}</p>
-            {% endif %}
-            <p>Criado em: {{ pedido.criado_em|date:"d/m/Y H:i" }}</p>
+        <section class="order-grid" aria-label="Lista de pedidos">
+            {% for pedido in pedidos %}
+                <article class="order-card">
+                    <div>
+                        <h2>Pedido #{{ pedido.id }} · Mesa {{ pedido.mesa.numero }}</h2>
+                        <p class="order-meta">
+                            {{ pedido.garcom.usuario.get_full_name|default:pedido.garcom.usuario.username }}
+                            · {{ pedido.criado_em|timesince }} atrás
+                        </p>
+                        <p><span class="status-pill">{{ pedido.get_status_display|default:pedido.status }}</span></p>
+                    </div>
 
-            <ul>
-                {% for item in pedido.itempedido_set.all %}
-                    <li>
-                        {{ item.quantidade }}x {{ item.espeto.nome }}
-                        {% if item.ponto %}
-                            ({{ item.ponto }})
-                        {% endif %}
-                    </li>
-                {% empty %}
-                    <li>Sem itens registrados.</li>
-                {% endfor %}
-            </ul>
-        {% endfor %}
+                    <ul class="order-items">
+                        {% for item in pedido.itempedido_set.all %}
+                            <li>{{ item.espeto.nome }}{% if item.ponto %} · {{ item.ponto }}{% endif %}</li>
+                        {% empty %}
+                            <li>Sem itens registrados.</li>
+                        {% endfor %}
+                    </ul>
+
+                    <details class="status-box">
+                        <summary>Alterar status</summary>
+                        <div class="status-actions">
+                            {% if request.user.is_superuser %}
+                                {% if pedido.status == 'Em espera' %}
+                                    <a class="button button-warning" href="{% url 'atualizar_status_pedido' pedido.id 'Em Preparo' %}">Iniciar preparo</a>
+                                {% elif pedido.status == 'Em Preparo' %}
+                                    <a class="button button-success" href="{% url 'atualizar_status_pedido' pedido.id 'Pronto' %}">Marcar pronto</a>
+                                {% endif %}
+                            {% else %}
+                                {% for group in request.user.groups.all %}
+                                    {% if group.name == 'Churrasqueiro' %}
+                                        {% if pedido.status == 'Em espera' %}
+                                            <a class="button button-warning" href="{% url 'atualizar_status_pedido' pedido.id 'Em Preparo' %}">Iniciar preparo</a>
+                                        {% elif pedido.status == 'Em Preparo' %}
+                                            <a class="button button-success" href="{% url 'atualizar_status_pedido' pedido.id 'Pronto' %}">Marcar pronto</a>
+                                        {% endif %}
+                                    {% elif group.name == 'Garcom' and pedido.status == 'Pronto' %}
+                                        <a class="button" href="{% url 'atualizar_status_pedido' pedido.id 'Entregue' %}">Confirmar entrega</a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if pedido.status == 'Entregue' %}
+                                <span class="muted">Pedido entregue.</span>
+                            {% elif pedido.status != 'Pronto' and pedido.status != 'Em espera' and pedido.status != 'Em Preparo' %}
+                                <span class="muted">Nenhuma ação disponível.</span>
+                            {% endif %}
+                        </div>
+                    </details>
+                </article>
+            {% endfor %}
+        </section>
     {% else %}
-        <p>Não há pedidos pendentes de entrega.</p>
+        <div class="empty-state">Nenhum pedido encontrado com esses filtros.</div>
     {% endif %}
-</body>
-</html>
+{% endblock %}

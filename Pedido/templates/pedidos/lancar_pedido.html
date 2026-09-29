@@ -1,62 +1,51 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Novo Pedido</title>
-</head>
-<body>
-    <h2>Lançar Novo Pedido 🍔</h2>
+{% extends "base.html" %}
 
-    <form method="post">
-        {% csrf_token %}
-        
-        <!-- Formulário da Mesa (Pai) -->
-        <h3>Dados da Mesa</h3>
-        {{ form_pedido.as_p }}
+{% block title %}Novo pedido | Espetaria{% endblock %}
 
-        <hr>
+{% block content %}
+    <div class="page-heading">
+        <a class="back-link" href="{% url 'home' %}" aria-label="Voltar para a tela inicial" title="Voltar">←</a>
+        <div>
+            <h1>Novo pedido</h1>
+            <p>Escolha a mesa e adicione os espetos.</p>
+        </div>
+    </div>
 
-        <div id="espetos-container">
-            <!-- Formulários dos Espetos (Filhos - Formset) -->
-            <h3>Espetos</h3>
+    <section class="form-card">
+        <form method="post">
+            {% csrf_token %}
+
+            <h2>1. Selecione a mesa</h2>
+            <div class="table-selector">
+                {% for mesa_opcao in mesas %}
+                    <button type="button" class="mesa-btn" data-mesa="{{ mesa_opcao.id }}">
+                        Mesa {{ mesa_opcao.numero }}
+                    </button>
+                {% empty %}
+                    <p class="muted">Cadastre uma mesa antes de lançar pedidos.</p>
+                {% endfor %}
+            </div>
+            {{ form_pedido.as_p }}
+
+            <h2 class="section-title">2. Escolha os espetos</h2>
             {{ formset_itens.management_form }}
-            
-            {% for form in formset_itens %}
-                <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc;">
-                    {{ form.as_p }}
-                </div>
-            {% endfor %}
-        </div>
-        <button type="button" id="add-espeto">Adicionar Espeto</button>
+            <div id="espetos-container">
+                {% for form in formset_itens %}
+                    <div class="item-form">{{ form.as_p }}</div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add-espeto" class="button-secondary">+ Adicionar outro espeto</button>
+            <div id="empty-form" hidden>{{ formset_itens.empty_form.as_p }}</div>
 
-        <div id="empty-form" style="display: none;">
-            {{ formset_itens.empty_form.as_p }}
-        </div>
+            <div class="form-actions">
+                <button type="submit">Salvar pedido</button>
+                <a class="back-link" href="{% url 'home' %}" aria-label="Cancelar e voltar" title="Cancelar">←</a>
+            </div>
+        </form>
+    </section>
+{% endblock %}
 
-        <br>
-        <button type="submit">Salvar Pedido</button>
-        <a href="{% url 'home' %}">Cancelar</a>
-    </form>
-
-    <script>
-        document.getElementById('add-espeto').addEventListener('click', function() {
-            const container = document.getElementById('espetos-container');
-            const emptyForm = document.getElementById('empty-form').innerHTML;
-            const totalForms = parseInt(document.getElementById('id_itempedido_set-TOTAL_FORMS').value);
-
-            // Atualiza o índice do formulário vazio
-            const newFormHtml = emptyForm.replace(/__prefix__/g, totalForms);
-            const newDiv = document.createElement('div');
-            newDiv.style.marginBottom = '15px';
-            newDiv.style.padding = '10px';
-            newDiv.style.border = '1px solid #ccc';
-            newDiv.innerHTML = newFormHtml;
-
-            container.appendChild(newDiv);
-
-            // Atualiza o total de formulários
-            document.getElementById('id_itempedido_set-TOTAL_FORMS').value = totalForms + 1;
-        });
-    </script>
-</body>
-</html>
+{% block scripts %}
+    {% load static %}
+    <script src="{% static 'Pedido/js/lancar_pedido.js' %}" defer></script>
+{% endblock %}

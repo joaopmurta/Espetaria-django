@@ -1,24 +1,44 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<header>
-    <meta charset="UTF-8">
-    <title>Painel de Controle</title>
-</header>
-<body>
-    <h1>Painel de Controle de Espetos</h1>
-    <a href="{% url 'adicionar_espeto'%}">Adicionar</a>
-    <a href="{% url 'garcom/home_pedidos'%}">Voltar</a>
-    <table>
-        {% for espeto in espetos %} 
-            <tr> 
-                <td> {{ espeto.id }} </td>
-                <td> {{ espeto.nome }}</td> 
-                <td> {{ espeto.tipo }}</td>
-                <td> {{ espeto.preco }}</td>
-                <td> <a href="{% url 'editar_espeto' espeto.id %}">Editar</a></td>
-                <td> <a href="{% url 'deletar_espeto' espeto.id%}">Deletar</a></td>
-            </tr> 
-        {% endfor %}
-    </table>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Gerenciar espetos | Espetaria{% endblock %}
+
+{% block content %}
+    <div class="page-heading">
+        <a class="back-link" href="{% url 'home' %}" aria-label="Voltar para a tela inicial" title="Voltar">←</a>
+        <div>
+            <h1>Gerenciar espetos</h1>
+            <p>Consulte e atualize os itens do cardápio.</p>
+        </div>
+        <a class="button" href="{% url 'adicionar_espeto' %}">Adicionar espeto</a>
+    </div>
+
+    <section class="panel table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Preço</th>
+                    <th scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for espeto in espetos %}
+                    <tr>
+                        <td>{{ espeto.id }}</td>
+                        <td>{{ espeto.nome }}</td>
+                        <td>{{ espeto.tipo }}</td>
+                        <td>R$ {{ espeto.preco }}</td>
+                        <td class="table-actions">
+                            <a class="button button-secondary" href="{% url 'editar_espeto' espeto.id %}">Editar</a>
+                            <a class="button button-danger" href="{% url 'deletar_espeto' espeto.id %}">Excluir</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5" class="muted">Nenhum espeto cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endblock %}
